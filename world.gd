@@ -10,8 +10,8 @@ func _ready() -> void:
 	var used := tile_map.get_used_rect()
 	# 再取得每個方塊的size
 	var tile_size := tile_map.tile_set.tile_size
-	print($"used: ", used)
-	print($"tile_size: ", tile_size)
+	#print($"used: ", used)
+	#print($"tile_size: ", tile_size)
 	# used.position.y * tile_size.y 代表y軸向上我們用了幾個方塊乘上每個方塊的高度
 	camera_2d.limit_top = used.position.y * tile_size.y
 	camera_2d.limit_right = used.end.x * tile_size.x
