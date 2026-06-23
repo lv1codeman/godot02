@@ -51,9 +51,9 @@ func tick_physics(state: State, delta: float) -> void:
 		State.FALL:
 			move(default_gravity, delta)
 		State.LANDING:
-			stand(delta)
+			stand(default_gravity, delta)
 		State.ATTACK_1, State.ATTACK_2:
-			stand(delta)
+			stand(default_gravity, delta)
 		
 	is_first_tick = false
 			
@@ -68,9 +68,9 @@ func move(gravity: float, delta: float) -> void:
 		
 	move_and_slide()
 	
-func stand(delta: float) -> void:
+func stand(gravity: float, delta: float) -> void:
 	velocity.x = 0.0
-	velocity.y += default_gravity * delta
+	velocity.y += gravity * delta
 	move_and_slide()
 	
 func get_next_state(state: State) -> State:
