@@ -52,7 +52,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, 6)]
+"values": [Vector2(0, 0)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -129,7 +129,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(0, 5), Vector2(20, 3)]
+"values": [Vector2(0, 4), Vector2(20, 3)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -206,7 +206,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(30, 5), Vector2(20, 3)]
+"values": [Vector2(30, 3), Vector2(20, 3)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -607,7 +607,7 @@ tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, 6)]
+"values": [Vector2(0, 0)]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
@@ -642,7 +642,6 @@ script = ExtResource("1_onrkg")
 metadata/_edit_horizontal_guides_ = [38.0]
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1198071862]
-position = Vector2(0, 6)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("1_4flbx")
 hframes = 4
