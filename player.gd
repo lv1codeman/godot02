@@ -5,13 +5,15 @@ enum State{
 	RUNNING,
 	JUMP,
 	FALL,
+	LANDING,
 }
 
-const GROUND_STATES := [State.IDLE, State.RUNNING]
+const GROUND_STATES := [State.IDLE, State.RUNNING, State.LANDING]
 const RUN_SPEED := 160.0
 const JUMP_VELOCITY := -300.0
 
-var gravity := ProjectSettings.get("physics/2d/default_gravity") as float
+var default_gravity := ProjectSettings.get("physics/2d/default_gravity") as float
+var is_first_tick := false
 
 @onready var sprite_2d: Sprite2D = $Sprite2D
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -31,15 +33,20 @@ func _unhandled_input(event: InputEvent) -> void:
 func tick_physics(state: State, delta: float) -> void:
 	match state:
 		State.IDLE:
-			move(delta)
+			move(default_gravity, delta)
 		State.RUNNING:
-			move(delta)
+			move(default_gravity, delta)
 		State.JUMP:
-			move(delta)
+			move(0.0 if is_first_tick else default_gravity, delta)
 		State.FALL:
-			move(delta)
+			move(default_gravity, delta)
+		State.LANDING:
+			move(default_gravity, delta)
 			
-func move(delta: float) -> void:
+	is_first_tick = false
+			
+			
+func move(gravity: float, delta: float) -> void:
 	var direction := Input.get_axis("move_left","move_right")
 	velocity.x = direction * RUN_SPEED
 	velocity.y += gravity * delta
@@ -77,7 +84,10 @@ func get_next_state(state: State) -> State:
 				return State.FALL
 		State.FALL:
 			if is_on_floor():
-				return State.IDLE if is_still else State.RUNNING
+				return State.LANDING
+		State.LANDING:
+			if not animation_player.is_playing():
+				return State.IDLE
 		
 	return state
 
@@ -99,4 +109,6 @@ func transition_state(from: State, to: State) -> void:
 			animation_player.play("fall")
 			if from in GROUND_STATES:
 				coyote_timer.start()
-		
+		State.LANDING:
+			animation_player.play("landing")
+	is_first_tick = true
