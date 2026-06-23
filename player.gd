@@ -7,6 +7,7 @@ enum State{
 	FALL,
 	LANDING,
 	WALL_SLIDING,
+	WALL_JUMP,
 	ATTACK_1,
 	ATTACK_2,
 }
@@ -17,6 +18,7 @@ const GROUND_STATES := [
 	]
 const RUN_SPEED := 160.0
 const JUMP_VELOCITY := -300.0
+const WALL_JUMP_VELOCITY := Vector2(300, -320)
 
 @export var can_combo := false
 
@@ -30,6 +32,7 @@ var is_combo_requested := false
 @onready var jump_request_timer: Timer = $JumpRequestTimer
 @onready var hand_checker: RayCast2D = $Graphics/HandChecker
 @onready var foot_checker: RayCast2D = $Graphics/FootChecker
+@onready var state_machine: StateMachine = $StateMachine
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("jump"):
@@ -58,6 +61,13 @@ func tick_physics(state: State, delta: float) -> void:
 		State.WALL_SLIDING:
 			move(default_gravity / 3, delta)
 			graphics.scale.x = get_wall_normal().x
+		State.WALL_JUMP:
+			if state_machine.state_time < 0.1:
+				velocity.y += (0.0 if is_first_tick else default_gravity) * delta
+				move_and_slide()
+				graphics.scale.x = get_wall_normal().x
+			else:
+				move(default_gravity, delta)
 		State.ATTACK_1, State.ATTACK_2:
 			stand(default_gravity, delta)
 		
@@ -82,11 +92,12 @@ func stand(gravity: float, delta: float) -> void:
 	velocity.y += gravity * delta
 	move_and_slide()
 	
+func can_wall_slide() -> bool:
+	return is_on_wall() and hand_checker.is_colliding() and foot_checker.is_colliding()
+	
 func get_next_state(state: State) -> State:
 	var can_jump := is_on_floor() or coyote_timer.time_left > 0
 	var should_jump := can_jump and jump_request_timer.time_left > 0
-	print("can_jump: ", can_jump)
-	print("should_jump: ", should_jump)
 	if should_jump:
 		return State.JUMP
 	
@@ -114,7 +125,7 @@ func get_next_state(state: State) -> State:
 		State.FALL:
 			if is_on_floor():
 				return State.LANDING if is_still else State.RUNNING
-			if is_on_wall() and hand_checker.is_colliding() and foot_checker.is_colliding():
+			if can_wall_slide():
 				return State.WALL_SLIDING
 		State.LANDING:
 			if not is_still:
@@ -122,9 +133,16 @@ func get_next_state(state: State) -> State:
 			if not animation_player.is_playing():
 				return State.IDLE
 		State.WALL_SLIDING:
+			if jump_request_timer.time_left > 0:
+				return State.WALL_JUMP
 			if is_on_floor():
 				return State.IDLE
 			if not is_on_wall():
+				return State.FALL
+		State.WALL_JUMP:
+			if can_wall_slide() and not is_first_tick:
+				return State.WALL_SLIDING
+			if velocity.y >= 0:
 				return State.FALL
 		State.ATTACK_1:
 			if not animation_player.is_playing():
@@ -135,6 +153,12 @@ func get_next_state(state: State) -> State:
 	return state
 
 func transition_state(from: State, to: State) -> void:
+	print("[%s] %s => %s" % [
+		Engine.get_physics_frames(),
+		State.keys()[from] if from != -1 else "<START>",
+		State.keys()[to],
+	])
+	
 	if from not in GROUND_STATES and to in GROUND_STATES:
 		coyote_timer.stop()
 	
@@ -156,6 +180,11 @@ func transition_state(from: State, to: State) -> void:
 			animation_player.play("landing")
 		State.WALL_SLIDING:
 			animation_player.play("wall_sliding")
+		State.WALL_JUMP:
+			animation_player.play("jump")
+			velocity = WALL_JUMP_VELOCITY
+			velocity.x *= get_wall_normal().x
+			jump_request_timer.stop()
 		State.ATTACK_1:
 			animation_player.play("attack_1")
 			is_combo_requested = false
