@@ -6,6 +6,7 @@ enum State{
 	JUMP,
 	FALL,
 	LANDING,
+	WALL_SLIDING,
 	ATTACK_1,
 	ATTACK_2,
 }
@@ -23,10 +24,12 @@ var default_gravity := ProjectSettings.get("physics/2d/default_gravity") as floa
 var is_first_tick := false
 var is_combo_requested := false
 
-@onready var sprite_2d: Sprite2D = $Sprite2D
+@onready var graphics: Node2D = $Graphics
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var coyote_timer: Timer = $CoyoteTimer
 @onready var jump_request_timer: Timer = $JumpRequestTimer
+@onready var hand_checker: RayCast2D = $Graphics/HandChecker
+@onready var foot_checker: RayCast2D = $Graphics/FootChecker
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("jump"):
@@ -52,6 +55,9 @@ func tick_physics(state: State, delta: float) -> void:
 			move(default_gravity, delta)
 		State.LANDING:
 			stand(default_gravity, delta)
+		State.WALL_SLIDING:
+			move(default_gravity / 3, delta)
+			graphics.scale.x = get_wall_normal().x
 		State.ATTACK_1, State.ATTACK_2:
 			stand(default_gravity, delta)
 		
@@ -64,14 +70,14 @@ func move(gravity: float, delta: float) -> void:
 	velocity.y += gravity * delta
 		
 	if not is_zero_approx(direction):
-		sprite_2d.flip_h = direction < 0
+		graphics.scale.x = -1 if direction < 0 else +1
 		
 	move_and_slide()
 	
 func stand(gravity: float, delta: float) -> void:
 	var direction := Input.get_axis("move_left", "move_right")
 	if not is_zero_approx(direction):
-		sprite_2d.flip_h = direction < 0
+		graphics.scale.x = -1 if direction < 0 else +1
 	velocity.x = 0.0
 	velocity.y += gravity * delta
 	move_and_slide()
@@ -108,11 +114,18 @@ func get_next_state(state: State) -> State:
 		State.FALL:
 			if is_on_floor():
 				return State.LANDING if is_still else State.RUNNING
+			if is_on_wall() and hand_checker.is_colliding() and foot_checker.is_colliding():
+				return State.WALL_SLIDING
 		State.LANDING:
 			if not is_still:
 				return State.RUNNING
 			if not animation_player.is_playing():
 				return State.IDLE
+		State.WALL_SLIDING:
+			if is_on_floor():
+				return State.IDLE
+			if not is_on_wall():
+				return State.FALL
 		State.ATTACK_1:
 			if not animation_player.is_playing():
 				return State.ATTACK_2 if is_combo_requested else State.IDLE
@@ -141,6 +154,8 @@ func transition_state(from: State, to: State) -> void:
 				coyote_timer.start()
 		State.LANDING:
 			animation_player.play("landing")
+		State.WALL_SLIDING:
+			animation_player.play("wall_sliding")
 		State.ATTACK_1:
 			animation_player.play("attack_1")
 			is_combo_requested = false
