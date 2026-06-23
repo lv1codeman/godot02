@@ -69,6 +69,9 @@ func move(gravity: float, delta: float) -> void:
 	move_and_slide()
 	
 func stand(gravity: float, delta: float) -> void:
+	var direction := Input.get_axis("move_left", "move_right")
+	if not is_zero_approx(direction):
+		sprite_2d.flip_h = direction < 0
 	velocity.x = 0.0
 	velocity.y += gravity * delta
 	move_and_slide()
