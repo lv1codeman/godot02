@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bjwebo3fn7g13"]
+
+[ext_resource type="Script" uid="uid://bkkcrd0apjmuf" path="res://enemies/enemy.gd" id="1_7frlh"]
+[ext_resource type="Script" uid="uid://cbdriwm0ofw5o" path="res://classes/StateMachine.gd" id="1_fw1ev"]
+
+[node name="Enemy" type="CharacterBody2D" unique_id=1776632562]
+collision_layer = 4
+script = ExtResource("1_7frlh")
+
+[node name="Graphics" type="Node2D" parent="." unique_id=1802682163]
+
+[node name="Sprite2D" type="Sprite2D" parent="Graphics" unique_id=821635060]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1810693036]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=809248866]
+root_node = NodePath("../CollisionShape2D")
+
+[node name="StateMachine" type="Node" parent="." unique_id=5998391]
+script = ExtResource("1_fw1ev")
+metadata/_custom_type_script = "uid://cbdriwm0ofw5o"

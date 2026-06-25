@@ -956,6 +956,7 @@ _data = {
 }
 
 [node name="Player" type="CharacterBody2D" unique_id=2138518394]
+collision_layer = 2
 script = ExtResource("1_onrkg")
 metadata/_edit_horizontal_guides_ = [38.0]
 

@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cob2ohauedb1d" path="res://assets/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="5_036b0"]
 [ext_resource type="Texture2D" uid="uid://8ip5pd73vdwn" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Background-Tree2.png" id="6_pkg7o"]
 [ext_resource type="Texture2D" uid="uid://crpyabgrjqsgl" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Background-Tree1.png" id="7_gbfbk"]
+[ext_resource type="PackedScene" uid="uid://b3vohmycmvxbi" path="res://enemies/boar.tscn" id="8_gbfbk"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fj7yv"]
 texture = ExtResource("1_f3sb7")
@@ -403,7 +404,7 @@ layer_2/name = "Foreground"
 layer_2/tile_data = PackedInt32Array(655352, 458752, 3, 655355, 524288, 2, 655358, 524288, 2, 655359, 589824, 3, 589826, 458752, 3, 589825, 655360, 2, 720899, 458752, 3, 720902, 524288, 3, 720905, 655360, 2, 720906, 589824, 3, 720908, 589824, 3, -196606, 524288, 2, -196601, 589824, 3, -196599, 655360, 2, -196597, 589824, 2, -196596, 589824, 3, -196593, 393216, 3, -196591, 589824, 2, -917496, 393216, 3, -917495, 458752, 3, -917491, 655360, 2, -917489, 589824, 3, -917487, 589824, 3, -917481, 524288, 2, -917480, 589824, 3, -524292, 655360, 2, -786440, 589824, 3, -983041, 655360, 2, -1048574, 458752, 3, -1048570, 524288, 2, -524271, 589824, 3, -524264, 589824, 3, -524266, 458752, 3, -524268, 393216, 3, -1572849, 589824, 3, -1572844, 655360, 2, -1703922, 458752, 3, -1703927, 589824, 3, -1703928, 589824, 2, -1703930, 458752, 3, -1703933, 589824, 2, -1703935, 589824, 3, -1638401, 655360, 2, -1638402, 589824, 3, -2555909, 524288, 3, -2555907, 524288, 2, -2621436, 589824, 3, -2621434, 524288, 2, -2621428, 458752, 3, -2621425, 524288, 3, -2621422, 655360, 2, -2621420, 458752, 3, -2293742, 589824, 3, -2293738, 524288, 2, -2293737, 393216, 3, -2293736, 524288, 3, -2162671, 524288, 2, -2162672, 524288, 3, -2162674, 524288, 3, -2162676, 524288, 2, -2162681, 524288, 3, -2162683, 589824, 3, -2162685, 655360, 2, -2162686, 458752, 3, -2097154, 589824, 3, -2097156, 524288, 2, -2555912, 524288, 3, -2555911, 655360, 2, -2621440, 458752, 3, -2621438, 458752, 3)
 
 [node name="Player" parent="." unique_id=2138518394 instance=ExtResource("2_fj7yv")]
-position = Vector2(-61, 106)
+position = Vector2(159, 115)
 scale = Vector2(0.5, 0.5)
 
 [node name="Camera2D" type="Camera2D" parent="Player" unique_id=554400077]
@@ -698,3 +699,9 @@ position = Vector2(-97, 29)
 texture = ExtResource("1_f3sb7")
 region_enabled = true
 region_rect = Rect2(210, 293, 124, 86)
+
+[node name="Boar" parent="." unique_id=1776632562 instance=ExtResource("8_gbfbk")]
+position = Vector2(-43, 144)
+direction = -1
+max_speed = 180.0
+acceleration = 2000.0
