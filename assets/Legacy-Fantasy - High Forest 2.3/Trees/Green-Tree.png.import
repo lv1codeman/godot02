@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jdsqlr4up2vh"
-path="res://.godot/imported/wallslide01.png-fd7dc50ff0b495a68359a0368ac7f882.ctex"
+uid="uid://tt70wlvuoxa7"
+path="res://.godot/imported/Green-Tree.png-fff44cb6b8df75114038d2188e106653.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://wallslide01.png"
-dest_files=["res://.godot/imported/wallslide01.png-fd7dc50ff0b495a68359a0368ac7f882.ctex"]
+source_file="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Green-Tree.png"
+dest_files=["res://.godot/imported/Green-Tree.png-fff44cb6b8df75114038d2188e106653.ctex"]
 
 [params]
 

@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://b8uc34lleff0t"]
 
-[ext_resource type="Texture2D" uid="uid://d4ak3oi4yjemu" path="res://yen10.png" id="1_4flbx"]
+[ext_resource type="Texture2D" uid="uid://d4ak3oi4yjemu" path="res://assets/yen10.png" id="1_4flbx"]
 [ext_resource type="Script" uid="uid://b43t5gye7h74a" path="res://player.gd" id="1_onrkg"]
-[ext_resource type="Texture2D" uid="uid://jdsqlr4up2vh" path="res://wallslide01.png" id="3_hqtel"]
+[ext_resource type="Texture2D" uid="uid://jdsqlr4up2vh" path="res://assets/wallslide01.png" id="3_hqtel"]
 [ext_resource type="Script" uid="uid://cbdriwm0ofw5o" path="res://classes/StateMachine.gd" id="3_i3pqv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4flbx"]
-size = Vector2(16, 65)
+size = Vector2(16, 63)
 
 [sub_resource type="Animation" id="Animation_onrkg"]
 length = 0.001
@@ -190,7 +190,7 @@ tracks/5/path = NodePath(".:can_combo")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.3),
+"times": PackedFloat32Array(0, 0.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, true]
@@ -980,7 +980,7 @@ target_position = Vector2(15, 0)
 libraries/ = SubResource("AnimationLibrary_2hs0m")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1491126004]
-position = Vector2(0, 4.5)
+position = Vector2(0, 5.5)
 shape = SubResource("RectangleShape2D_4flbx")
 
 [node name="StateMachine" type="Node" parent="." unique_id=1652660411]

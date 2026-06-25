@@ -7,7 +7,7 @@ extends Node2D
 func _ready() -> void:
 	# 設定camera的limit，確保玩家不會看到地圖外的東西
 	# 先得到我們在tile_map上使用到的範圍
-	var used := tile_map.get_used_rect()
+	var used := tile_map.get_used_rect().grow(-1)
 	# 再取得每個方塊的size
 	var tile_size := tile_map.tile_set.tile_size
 	#print($"used: ", used)
