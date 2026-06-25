@@ -5,7 +5,14 @@
 [ext_resource type="Script" uid="uid://d2vvicpg0wvwn" path="res://enemies/boar.gd" id="2_iippf"]
 [ext_resource type="Texture2D" uid="uid://b1i4lbca0l7fs" path="res://assets/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Hit-Vanish/Hit-Sheet.png" id="3_imo2m"]
 [ext_resource type="Texture2D" uid="uid://bymoioyg02uxa" path="res://assets/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Run/Run-Sheet.png" id="4_iippf"]
+[ext_resource type="Script" uid="uid://b20vt8ibyleja" path="res://classes/Hurtbox.gd" id="4_qb4tn"]
 [ext_resource type="Texture2D" uid="uid://dhjerpsewya2f" path="res://assets/Legacy-Fantasy - High Forest 2.3/Mob/Boar/Walk/Walk-Base-Sheet.png" id="5_qb4tn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_iippf"]
+size = Vector2(23, 23)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qb4tn"]
+size = Vector2(40, 10)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kdngy"]
 radius = 11.0
@@ -289,9 +296,6 @@ _data = {
 
 [node name="Boar" unique_id=1776632562 instance=ExtResource("1_7qeyt")]
 script = ExtResource("2_iippf")
-direction = null
-max_speed = null
-acceleration = null
 
 [node name="Sprite2D" parent="Graphics" parent_id_path=PackedInt32Array(1802682163) index="0" unique_id=821635060]
 position = Vector2(0, -16)
@@ -313,6 +317,28 @@ collision_mask = 2
 position = Vector2(-15, -1)
 target_position = Vector2(0, 5)
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/Hitbox" parent_id_path=PackedInt32Array(1074130849) index="0" unique_id=559333409]
+position = Vector2(-1.5, -11.5)
+shape = SubResource("RectangleShape2D_iippf")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Graphics/Hitbox" parent_id_path=PackedInt32Array(1074130849) index="1" unique_id=1930533733]
+position = Vector2(-2, -8)
+shape = SubResource("RectangleShape2D_qb4tn")
+
+[node name="Hurtbox" type="Area2D" parent="Graphics" parent_id_path=PackedInt32Array(1802682163) index="5" unique_id=108586849]
+collision_layer = 16
+collision_mask = 0
+script = ExtResource("4_qb4tn")
+metadata/_custom_type_script = "uid://b20vt8ibyleja"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/Hurtbox" index="0" unique_id=984324432]
+position = Vector2(-1.5, -11.5)
+shape = SubResource("RectangleShape2D_iippf")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Graphics/Hurtbox" index="1" unique_id=1914828204]
+position = Vector2(-2, -8)
+shape = SubResource("RectangleShape2D_qb4tn")
+
 [node name="CollisionShape2D" parent="." index="1" unique_id=1810693036]
 position = Vector2(0, -11)
 shape = SubResource("CircleShape2D_kdngy")
@@ -323,3 +349,5 @@ libraries/ = SubResource("AnimationLibrary_imo2m")
 [node name="CalmDownTimer" type="Timer" parent="." index="4" unique_id=824586093]
 wait_time = 2.5
 one_shot = true
+
+[connection signal="hurt" from="Graphics/Hurtbox" to="." method="_on_hurtbox_hurt"]
