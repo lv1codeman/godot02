@@ -11,9 +11,6 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iippf"]
 size = Vector2(23, 23)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_qb4tn"]
-size = Vector2(40, 10)
-
 [sub_resource type="CircleShape2D" id="CircleShape2D_kdngy"]
 radius = 11.0
 
@@ -605,10 +602,6 @@ target_position = Vector2(0, 5)
 position = Vector2(-1.5, -11.5)
 shape = SubResource("RectangleShape2D_iippf")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Graphics/Hitbox" parent_id_path=PackedInt32Array(1074130849) index="1" unique_id=1930533733]
-position = Vector2(-2, -8)
-shape = SubResource("RectangleShape2D_qb4tn")
-
 [node name="Hurtbox" type="Area2D" parent="Graphics" parent_id_path=PackedInt32Array(1802682163) index="5" unique_id=108586849]
 collision_layer = 16
 collision_mask = 0
@@ -618,10 +611,6 @@ metadata/_custom_type_script = "uid://b20vt8ibyleja"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Graphics/Hurtbox" index="0" unique_id=984324432]
 position = Vector2(-1.5, -11.5)
 shape = SubResource("RectangleShape2D_iippf")
-
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Graphics/Hurtbox" index="1" unique_id=1914828204]
-position = Vector2(-2, -8)
-shape = SubResource("RectangleShape2D_qb4tn")
 
 [node name="CollisionShape2D" parent="." index="1" unique_id=1810693036]
 position = Vector2(0, -11)

@@ -11,6 +11,8 @@ enum State{
 	WALL_JUMP,
 	ATTACK_1,
 	ATTACK_2,
+	HURT,
+	DYING,
 }
 
 const GROUND_STATES := [
@@ -18,14 +20,18 @@ const GROUND_STATES := [
 	State.ATTACK_1, State.ATTACK_2
 	]
 const RUN_SPEED := 160.0
+const FLOOR_ACCELERATION := RUN_SPEED / 0.2
+const AIR_ACCELERATION := RUN_SPEED / 0.1
 const JUMP_VELOCITY := -300.0
 const WALL_JUMP_VELOCITY := Vector2(300, -320)
+const KNOCKBACK_AMOUNT := 512.0
 
 @export var can_combo := false
 
 var default_gravity := ProjectSettings.get("physics/2d/default_gravity") as float
 var is_first_tick := false
 var is_combo_requested := false
+var pending_damage: Damage
 
 @onready var graphics: Node2D = $Graphics
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -34,6 +40,8 @@ var is_combo_requested := false
 @onready var hand_checker: RayCast2D = $Graphics/HandChecker
 @onready var foot_checker: RayCast2D = $Graphics/FootChecker
 @onready var state_machine: StateMachine = $StateMachine
+@onready var stats: Stats = $Stats
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("jump"):
@@ -71,13 +79,19 @@ func tick_physics(state: State, delta: float) -> void:
 				move(default_gravity, delta)
 		State.ATTACK_1, State.ATTACK_2:
 			stand(default_gravity, delta)
+			
+		State.HURT, State.DYING:
+			stand(default_gravity, delta)
 		
 	is_first_tick = false
 			
 			
 func move(gravity: float, delta: float) -> void:
 	var direction := Input.get_axis("move_left","move_right")
+	var acceleration := FLOOR_ACCELERATION if is_on_floor() else AIR_ACCELERATION
+	#velocity.x = move_toward(velocity.x, direction * RUN_SPEED, acceleration * delta)
 	velocity.x = direction * RUN_SPEED
+	
 	velocity.y += gravity * delta
 		
 	if not is_zero_approx(direction):
@@ -87,16 +101,24 @@ func move(gravity: float, delta: float) -> void:
 	
 func stand(gravity: float, delta: float) -> void:
 	var direction := Input.get_axis("move_left", "move_right")
-	if not is_zero_approx(direction):
-		graphics.scale.x = -1 if direction < 0 else +1
-	velocity.x = 0.0
+	var acceleration := FLOOR_ACCELERATION if is_on_floor() else AIR_ACCELERATION
+	if state_machine.current_state != State.DYING:
+		if not is_zero_approx(direction):
+			graphics.scale.x = -1 if direction < 0 else +1
+	velocity.x = move_toward(velocity.x, 0.0, acceleration * delta)
 	velocity.y += gravity * delta
 	move_and_slide()
 	
 func can_wall_slide() -> bool:
 	return is_on_wall() and hand_checker.is_colliding() and foot_checker.is_colliding()
 	
-func get_next_state(state: State) -> State:
+func get_next_state(state: State) -> int:
+	if stats.health == 0:
+		return StateMachine.KEEP_CURRENT if state == State.DYING else State.DYING
+		
+	if pending_damage:
+		return State.HURT
+		
 	var can_jump := is_on_floor() or coyote_timer.time_left > 0
 	var should_jump := can_jump and jump_request_timer.time_left > 0
 	if should_jump:
@@ -151,7 +173,14 @@ func get_next_state(state: State) -> State:
 		State.ATTACK_2:
 			if not animation_player.is_playing():
 				return State.IDLE
-	return state
+				
+		State.HURT:
+			if not animation_player.is_playing():
+				return State.IDLE
+				
+				
+				
+	return StateMachine.KEEP_CURRENT
 
 func transition_state(from: State, to: State) -> void:
 	#print("[%s] %s => %s" % [
@@ -193,4 +222,33 @@ func transition_state(from: State, to: State) -> void:
 			animation_player.play("attack_2")
 			is_combo_requested = false
 			
+		State.HURT:
+			animation_player.play("hurt")
+			stats.health -= pending_damage.amount
+			print("Player health: %s" % stats.health) # 這裡順便把原本 log 寫錯的 Boar 改成 Player
+			
+			# 1. 計算原始方向
+			var dir := pending_damage.source.global_position.direction_to(global_position)
+			# 2. 強制將 Y 軸歸零，只保留左右方向
+			dir.y = 0
+			# 3. 重新歸一化（避免因為拿掉 Y 軸導致長度縮短），再乘以擊退力道
+			velocity = dir.normalized() * KNOCKBACK_AMOUNT
+			pending_damage = null
+		State.DYING:
+			animation_player.play("die")
+			
 	is_first_tick = true
+
+
+func _on_hurtbox_hurt(hitbox: Hitbox) -> void:
+	pending_damage = Damage.new()
+	pending_damage.amount = 1
+	pending_damage.source = hitbox.owner
+	
+	
+	
+	
+	
+	
+	
+	

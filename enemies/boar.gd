@@ -33,12 +33,12 @@ func tick_physics(state: State, delta: float) -> void:
 			if can_see_player():
 				calm_down_timer.start()
 
-func get_next_state(state: State) -> State:
+func get_next_state(state: State) -> int:
 	if stats.health == 0:
-		return State.DYING
+		return StateMachine.KEEP_CURRENT if state == State.DYING else State.DYING
 		
 	if pending_damage:
-		return State.HURT	
+		return State.HURT
 		
 	match state:
 		State.IDLE:
@@ -60,7 +60,7 @@ func get_next_state(state: State) -> State:
 		State.HURT:
 			if not animation_player.is_playing():
 				return State.RUN
-	return state
+	return StateMachine.KEEP_CURRENT
 			
 func transition_state(from: State, to: State) -> void:
 	print("[%s] %s => %s" % [
