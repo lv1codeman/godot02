@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://b8uc34lleff0t" path="res://player.tscn" id="2_fj7yv"]
 [ext_resource type="Texture2D" uid="uid://xg3kk5lj3ngc" path="res://assets/Legacy-Fantasy - High Forest 2.3/Assets/Tiles.png" id="3_aqk2v"]
 [ext_resource type="Texture2D" uid="uid://cob2ohauedb1d" path="res://assets/Legacy-Fantasy - High Forest 2.3/Background/Background.png" id="5_036b0"]
+[ext_resource type="PackedScene" uid="uid://d23l54dptj2b2" path="res://items/potion.tscn" id="5_ioo17"]
 [ext_resource type="Texture2D" uid="uid://8ip5pd73vdwn" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Background-Tree2.png" id="6_pkg7o"]
 [ext_resource type="Texture2D" uid="uid://crpyabgrjqsgl" path="res://assets/Legacy-Fantasy - High Forest 2.3/Trees/Background-Tree1.png" id="7_gbfbk"]
 [ext_resource type="PackedScene" uid="uid://b3vohmycmvxbi" path="res://enemies/boar.tscn" id="8_gbfbk"]
@@ -717,3 +718,6 @@ position = Vector2(-53, -654)
 
 [node name="Boar6" parent="." unique_id=242555732 instance=ExtResource("8_gbfbk")]
 position = Vector2(223, -654)
+
+[node name="potion" parent="." unique_id=1437522345 instance=ExtResource("5_ioo17")]
+position = Vector2(305, -123)
