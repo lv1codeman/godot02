@@ -41,6 +41,7 @@ var pending_damage: Damage
 @onready var foot_checker: RayCast2D = $Graphics/FootChecker
 @onready var state_machine: StateMachine = $StateMachine
 @onready var stats: Stats = $Stats
+@onready var invincible_timer: Timer = $InvincibleTimer
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -56,6 +57,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		is_combo_requested = true
 
 func tick_physics(state: State, delta: float) -> void:
+	if invincible_timer.time_left > 0:
+		# 無敵時間閃爍效果 Time.get_ticks_msec() / 40 分母越大閃越慢
+		graphics.modulate.a = sin(Time.get_ticks_msec() / 25 ) * 0.5 + 0.5
+	else:
+		graphics.modulate.a = 1
+	
 	match state:
 		State.IDLE:
 			move(default_gravity, delta)
@@ -108,6 +115,9 @@ func stand(gravity: float, delta: float) -> void:
 	velocity.x = move_toward(velocity.x, 0.0, acceleration * delta)
 	velocity.y += gravity * delta
 	move_and_slide()
+	
+func die() -> void:
+	get_tree().reload_current_scene()
 	
 func can_wall_slide() -> bool:
 	return is_on_wall() and hand_checker.is_colliding() and foot_checker.is_colliding()
@@ -192,6 +202,8 @@ func transition_state(from: State, to: State) -> void:
 	if from not in GROUND_STATES and to in GROUND_STATES:
 		coyote_timer.stop()
 	
+	animation_player.speed_scale = 1.0
+	
 	match to:
 		State.IDLE:
 			animation_player.play("idle")
@@ -234,13 +246,21 @@ func transition_state(from: State, to: State) -> void:
 			# 3. 重新歸一化（避免因為拿掉 Y 軸導致長度縮短），再乘以擊退力道
 			velocity = dir.normalized() * KNOCKBACK_AMOUNT
 			pending_damage = null
+			# 受傷時開始無敵時間計時
+			invincible_timer.start()
 		State.DYING:
 			animation_player.play("die")
+			animation_player.speed_scale = 0.5
+			invincible_timer.stop()
 			
 	is_first_tick = true
 
 
 func _on_hurtbox_hurt(hitbox: Hitbox) -> void:
+	# 無敵時間
+	if invincible_timer.time_left > 0:
+		return
+	
 	pending_damage = Damage.new()
 	pending_damage.amount = 1
 	pending_damage.source = hitbox.owner
