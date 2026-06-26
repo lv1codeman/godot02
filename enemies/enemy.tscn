@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bkkcrd0apjmuf" path="res://enemies/enemy.gd" id="1_7frlh"]
 [ext_resource type="Script" uid="uid://cbdriwm0ofw5o" path="res://classes/StateMachine.gd" id="1_fw1ev"]
 [ext_resource type="Script" uid="uid://b53n1bsnbrqlr" path="res://classes/Hitbox.gd" id="2_orwns"]
+[ext_resource type="Script" uid="uid://cofaiompq3lud" path="res://classes/Stats.gd" id="4_a6vjd"]
 
 [node name="Enemy" type="CharacterBody2D" unique_id=1776632562]
 collision_layer = 4
@@ -26,3 +27,8 @@ root_node = NodePath("../CollisionShape2D")
 [node name="StateMachine" type="Node" parent="." unique_id=5998391]
 script = ExtResource("1_fw1ev")
 metadata/_custom_type_script = "uid://cbdriwm0ofw5o"
+
+[node name="Stats" type="Node" parent="." unique_id=661338739]
+script = ExtResource("4_a6vjd")
+max_health = 5
+metadata/_custom_type_script = "uid://cofaiompq3lud"
