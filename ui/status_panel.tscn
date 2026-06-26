@@ -24,6 +24,10 @@ region = Rect2(307, 21, 58, 6)
 atlas = ExtResource("2_7nptj")
 region = Rect2(308, 118, 56, 4)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_0jk47"]
+atlas = ExtResource("2_7nptj")
+region = Rect2(308, 86, 56, 4)
+
 [node name="StatusPanel" type="HBoxContainer" unique_id=129545260]
 script = ExtResource("1_0jk47")
 
@@ -43,7 +47,22 @@ layout_mode = 2
 size_flags_vertical = 4
 max_value = 1.0
 step = 0.0
-value = 1.0
+value = 0.8
 texture_over = SubResource("AtlasTexture_kl8nt")
 texture_progress = SubResource("AtlasTexture_21v3x")
+texture_progress_offset = Vector2(1, 1)
+
+[node name="EasedHealtheBar" type="TextureProgressBar" parent="HealthBar" unique_id=1365218834]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.0
+value = 1.0
+texture_progress = SubResource("AtlasTexture_0jk47")
 texture_progress_offset = Vector2(1, 1)
