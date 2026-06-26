@@ -1763,6 +1763,7 @@ one_shot = true
 
 [node name="Stats" type="Node" parent="." unique_id=58397492]
 script = ExtResource("7_1jxqw")
+max_health = 20
 metadata/_custom_type_script = "uid://cofaiompq3lud"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2037620956]
