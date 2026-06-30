@@ -1690,6 +1690,66 @@ _data = {
 &"wall_sliding": SubResource("Animation_n7ghd")
 }
 
+[sub_resource type="Animation" id="Animation_urp6f"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("..:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("..:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0.49411765)]
+}
+
+[sub_resource type="Animation" id="Animation_bwjto"]
+resource_name = "heal_popup"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("..:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -5), Vector2(0, -8)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("..:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0.49411765), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_606se"]
+_data = {
+&"RESET": SubResource("Animation_urp6f"),
+&"heal_popup": SubResource("Animation_bwjto")
+}
+
 [node name="Player" type="CharacterBody2D" unique_id=2138518394]
 collision_layer = 2
 script = ExtResource("1_onrkg")
@@ -1763,7 +1823,7 @@ one_shot = true
 
 [node name="Stats" type="Node" parent="." unique_id=58397492]
 script = ExtResource("7_1jxqw")
-max_health = 20
+max_health = 10
 metadata/_custom_type_script = "uid://cofaiompq3lud"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2037620956]
@@ -1775,5 +1835,23 @@ offset_right = 97.0
 offset_bottom = 32.0
 stats = NodePath("../../Stats")
 metadata/_edit_use_anchors_ = true
+
+[node name="EffectLayer" type="Node2D" parent="." unique_id=1903435673]
+modulate = Color(1, 1, 1, 0.49411765)
+
+[node name="DamageNumber" type="Label" parent="EffectLayer" unique_id=1096332849]
+visible = false
+offset_left = -19.0
+offset_top = -54.0
+offset_right = 21.0
+offset_bottom = -31.0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9411765)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+text = "+5"
+horizontal_alignment = 1
+
+[node name="EffectAnimationPlayer" type="AnimationPlayer" parent="EffectLayer/DamageNumber" unique_id=106628398]
+libraries/ = SubResource("AnimationLibrary_606se")
 
 [connection signal="hurt" from="Graphics/Hurtbox" to="." method="_on_hurtbox_hurt"]

@@ -42,6 +42,8 @@ var pending_damage: Damage
 @onready var state_machine: StateMachine = $StateMachine
 @onready var stats: Stats = $Stats
 @onready var invincible_timer: Timer = $InvincibleTimer
+@onready var damage_number_label: Label = $EffectLayer/DamageNumber
+@onready var effect_animation_player: AnimationPlayer = $EffectLayer/DamageNumber/EffectAnimationPlayer
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -75,8 +77,10 @@ func tick_physics(state: State, delta: float) -> void:
 		State.LANDING:
 			stand(default_gravity, delta)
 		State.WALL_SLIDING:
-			move(default_gravity / 3, delta)
+			move(default_gravity, delta)
 			graphics.scale.x = get_wall_normal().x
+			# 固定下滑速度
+			velocity.y = min(velocity.y, 120.0)
 		State.WALL_JUMP:
 			if state_machine.state_time < 0.1:
 				velocity.y += (0.0 if is_first_tick else default_gravity) * delta
@@ -265,7 +269,23 @@ func _on_hurtbox_hurt(hitbox: Hitbox) -> void:
 	pending_damage.amount = 1
 	pending_damage.source = hitbox.owner
 	
+
+func play_heal_effect(amount: int):
+	# 設定文字 (例如: "+3")
+	damage_number_label.text = "hp +" + str(amount)
 	
+	# 確保 Label 是可見的
+	damage_number_label.visible = true
+	
+	# 播放剛剛做好的動畫
+	# (AnimationPlayer 會在動畫結束時，根據我們設定的 Alpha 0，讓它看起來像消失)
+	effect_animation_player.play("heal_popup")
+
+	# (選做) 為了保險起見，可以在動畫結束後確保 Label 被隱藏
+	# effect_animation_player.animation_finished.connect(func(anim_name):
+	# 	if anim_name == "heal_popup":
+	# 		damage_number_label.visible = false
+	# , CONNECT_ONE_SHOT)
 	
 	
 	
