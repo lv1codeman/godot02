@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bh4up5hxv8ekc"
-path="res://.godot/imported/gdb-keyboard-2.png-2adb2e0b2254efa640b1328034afbc3b.ctex"
+uid="uid://c6p07elrrwwb1"
+path="res://.godot/imported/gdb-playstation-2.png-3fff21093fcef7973eb7d82251085e66.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gdb-keyboard-2.png"
-dest_files=["res://.godot/imported/gdb-keyboard-2.png-2adb2e0b2254efa640b1328034afbc3b.ctex"]
+source_file="res://assets/gdb-gamepad-2/gdb-playstation-2.png"
+dest_files=["res://.godot/imported/gdb-playstation-2.png-3fff21093fcef7973eb7d82251085e66.ctex"]
 
 [params]
 

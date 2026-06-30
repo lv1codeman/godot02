@@ -34,6 +34,7 @@ var is_first_tick := false
 var is_combo_requested := false
 var pending_damage: Damage
 var jump_count := 0         # 目前已經跳了幾次
+var interacting_with: Array[Interactable]
 
 @onready var graphics: Node2D = $Graphics
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -46,6 +47,7 @@ var jump_count := 0         # 目前已經跳了幾次
 @onready var invincible_timer: Timer = $InvincibleTimer
 @onready var damage_number_label: Label = $EffectLayer/DamageNumber
 @onready var effect_animation_player: AnimationPlayer = $EffectLayer/DamageNumber/EffectAnimationPlayer
+@onready var interaction_icon: AnimatedSprite2D = $InteractionIcon
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -59,9 +61,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("attack") and can_combo:
 		is_combo_requested = true
-
+	
+	if event.is_action_pressed("interact") and interacting_with:
+		interacting_with.back().interact()
 
 func tick_physics(state: State, delta: float) -> void:
+	interaction_icon.visible = not interacting_with.is_empty()
+	
 	if invincible_timer.time_left > 0:
 		# 無敵時間閃爍效果 Time.get_ticks_msec() / 40 分母越大閃越慢
 		graphics.modulate.a = sin(Time.get_ticks_msec() / 25 ) * 0.5 + 0.5
@@ -127,6 +133,15 @@ func stand(gravity: float, delta: float) -> void:
 func die() -> void:
 	get_tree().reload_current_scene()
 	
+func register_interactable(v: Interactable) -> void:
+	if state_machine.current_state == State.DYING:
+		return
+	if v in interacting_with:
+		return
+	interacting_with.append(v)
+
+func unregister_interactable(v: Interactable) -> void:
+	interacting_with.erase(v)
 
 func can_wall_slide() -> bool:
 	return is_on_wall() and hand_checker.is_colliding() and foot_checker.is_colliding()
@@ -275,6 +290,7 @@ func transition_state(from: State, to: State) -> void:
 			animation_player.play("die")
 			animation_player.speed_scale = 0.5
 			invincible_timer.stop()
+			interacting_with.clear()
 			
 	# 當玩家重新進入任何地面狀態時，將跳躍計數安全重置
 	if to in GROUND_STATES:

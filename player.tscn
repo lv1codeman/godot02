@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://b53n1bsnbrqlr" path="res://classes/Hitbox.gd" id="4_2hs0m"]
 [ext_resource type="Script" uid="uid://cofaiompq3lud" path="res://classes/Stats.gd" id="7_1jxqw"]
 [ext_resource type="PackedScene" uid="uid://d0y6c3kicjj7v" path="res://ui/status_panel.tscn" id="8_dw050"]
+[ext_resource type="Texture2D" uid="uid://bh4up5hxv8ekc" path="res://assets/gdb-gamepad-2/gdb-keyboard-2.png" id="9_b26j0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2hs0m"]
 size = Vector2(20, 61)
@@ -1750,6 +1751,42 @@ _data = {
 &"heal_popup": SubResource("Animation_bwjto")
 }
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_n7ghd"]
+atlas = ExtResource("9_b26j0")
+region = Rect2(96, 48, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nvl01"]
+atlas = ExtResource("9_b26j0")
+region = Rect2(96, 160, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ivps1"]
+atlas = ExtResource("9_b26j0")
+region = Rect2(96, 272, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_urp6f"]
+atlas = ExtResource("9_b26j0")
+region = Rect2(96, 384, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bwjto"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n7ghd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nvl01")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ivps1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_urp6f")
+}],
+"loop": true,
+"name": &"default",
+"speed": 6.0
+}]
+
 [node name="Player" type="CharacterBody2D" unique_id=2138518394]
 collision_layer = 2
 script = ExtResource("1_onrkg")
@@ -1853,5 +1890,10 @@ horizontal_alignment = 1
 
 [node name="EffectAnimationPlayer" type="AnimationPlayer" parent="EffectLayer/DamageNumber" unique_id=106628398]
 libraries/ = SubResource("AnimationLibrary_606se")
+
+[node name="InteractionIcon" type="AnimatedSprite2D" parent="." unique_id=1208241533]
+position = Vector2(0, -45)
+sprite_frames = SubResource("SpriteFrames_bwjto")
+autoplay = "default"
 
 [connection signal="hurt" from="Graphics/Hurtbox" to="." method="_on_hurtbox_hurt"]

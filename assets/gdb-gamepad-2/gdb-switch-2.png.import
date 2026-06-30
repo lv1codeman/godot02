@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dkpf6pi2acquw"
-path="res://.godot/imported/gdb-xbox-2.png-3ede905e467e3a38d7ef00a93889956d.ctex"
+uid="uid://rfhctv7jqqca"
+path="res://.godot/imported/gdb-switch-2.png-281bb7079f838f0422348b7f97f6f0dc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/gdb-xbox-2.png"
-dest_files=["res://.godot/imported/gdb-xbox-2.png-3ede905e467e3a38d7ef00a93889956d.ctex"]
+source_file="res://assets/gdb-gamepad-2/gdb-switch-2.png"
+dest_files=["res://.godot/imported/gdb-switch-2.png-281bb7079f838f0422348b7f97f6f0dc.ctex"]
 
 [params]
 
