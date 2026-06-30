@@ -53,7 +53,7 @@ var interacting_with: Array[Interactable]
 @onready var hand_checker: RayCast2D = $Graphics/HandChecker
 @onready var foot_checker: RayCast2D = $Graphics/FootChecker
 @onready var state_machine: StateMachine = $StateMachine
-@onready var stats: Stats = $Stats
+@onready var stats: Stats = Game.player_stats
 @onready var invincible_timer: Timer = $InvincibleTimer
 @onready var damage_number_label: Label = $EffectLayer/DamageNumber
 @onready var effect_animation_player: AnimationPlayer = $EffectLayer/DamageNumber/EffectAnimationPlayer
@@ -145,6 +145,7 @@ func stand(gravity: float, delta: float) -> void:
 
 func die() -> void:
 	get_tree().reload_current_scene()
+	Game.player_stats.max_health = 5
 	
 func register_interactable(v: Interactable) -> void:
 	if state_machine.current_state == State.DYING:
