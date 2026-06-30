@@ -9,7 +9,7 @@ script = ExtResource("1_qdmn5")
 
 [node name="PlayerStats" type="Node" parent="." unique_id=1543871089]
 script = ExtResource("2_j4t3q")
-max_health = 5
+max_health = 1
 metadata/_custom_type_script = "uid://cofaiompq3lud"
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=2020990241]

@@ -144,7 +144,10 @@ func stand(gravity: float, delta: float) -> void:
 	
 
 func die() -> void:
-	get_tree().reload_current_scene()
+	if stats:
+		stats.health = stats.max_health
+	#get_tree().reload_current_scene()
+	Game.reload_scene()
 	
 func register_interactable(v: Interactable) -> void:
 	if state_machine.current_state == State.DYING:
