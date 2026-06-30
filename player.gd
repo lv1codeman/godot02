@@ -1,5 +1,9 @@
 class_name Player
 extends CharacterBody2D
+enum Direction{
+	LEFT = -1,
+	RIGHT = +1,
+}
 
 enum State{
 	IDLE,
@@ -28,6 +32,12 @@ const KNOCKBACK_AMOUNT := 512.0
 
 @export var can_combo := false
 @export var max_jumps := 2  # 最大跳躍次數（2 代表可以二段跳）
+@export var direction := Direction.RIGHT:
+	set(v):
+		direction = v
+		if not is_node_ready():
+			await ready
+		graphics.scale.x = direction
 
 var default_gravity := ProjectSettings.get("physics/2d/default_gravity") as float
 var is_first_tick := false
@@ -88,13 +98,14 @@ func tick_physics(state: State, delta: float) -> void:
 		State.WALL_SLIDING:
 			move(default_gravity, delta)
 			graphics.scale.x = get_wall_normal().x
+			direction = Direction.LEFT if get_wall_normal().x < 0 else Direction.RIGHT
 			# 固定下滑速度最大值（防止撞擊天花板後速度失控暴增）
 			velocity.y = min(velocity.y, 120.0)
 		State.WALL_JUMP:
 			if state_machine.state_time < 0.1:
 				velocity.y += (0.0 if is_first_tick else default_gravity) * delta
 				move_and_slide()
-				graphics.scale.x = get_wall_normal().x
+				direction = Direction.LEFT if get_wall_normal().x < 0 else Direction.RIGHT
 			else:
 				move(default_gravity, delta)
 		State.ATTACK_1, State.ATTACK_2:
@@ -107,24 +118,26 @@ func tick_physics(state: State, delta: float) -> void:
 			
 			
 func move(gravity: float, delta: float) -> void:
-	var direction := Input.get_axis("move_left","move_right")
-	#velocity.x = move_toward(velocity.x, direction * RUN_SPEED, acceleration * delta)
-	velocity.x = direction * RUN_SPEED
+	var movement := Input.get_axis("move_left","move_right")
+	#velocity.x = move_toward(velocity.x, movement * RUN_SPEED, acceleration * delta)
+	velocity.x = movement * RUN_SPEED
 	
 	velocity.y += gravity * delta
 		
-	if not is_zero_approx(direction):
-		graphics.scale.x = -1 if direction < 0 else +1
+	if not is_zero_approx(movement):
+		#graphics.scale.x = -1 if movement < 0 else +1
+		direction = Direction.LEFT if movement < 0 else Direction.RIGHT
 		
 	move_and_slide()
 	
 
 func stand(gravity: float, delta: float) -> void:
-	var direction := Input.get_axis("move_left", "move_right")
+	var movement := Input.get_axis("move_left", "move_right")
 	var acceleration := FLOOR_ACCELERATION if is_on_floor() else AIR_ACCELERATION
 	if state_machine.current_state != State.DYING:
-		if not is_zero_approx(direction):
-			graphics.scale.x = -1 if direction < 0 else +1
+		if not is_zero_approx(movement):
+			#graphics.scale.x = -1 if movement < 0 else +1
+			direction = Direction.LEFT if movement < 0 else Direction.RIGHT
 	velocity.x = move_toward(velocity.x, 0.0, acceleration * delta)
 	velocity.y += gravity * delta
 	move_and_slide()
@@ -176,8 +189,8 @@ func get_next_state(state: State) -> int:
 		if not is_on_floor() and not is_wall_slide_related_state(state):
 			return State.FALL
 	
-	var direction := Input.get_axis("move_left","move_right")
-	var is_still := is_zero_approx(direction) and is_zero_approx(velocity.x)
+	var movement := Input.get_axis("move_left","move_right")
+	var is_still := is_zero_approx(movement) and is_zero_approx(velocity.x)
 		
 	# 6. 詳細狀態機轉換
 	match state:

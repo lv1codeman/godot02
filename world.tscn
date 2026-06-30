@@ -432,6 +432,7 @@ metadata/_custom_type_script = "uid://dtb63mo7rxraa"
 [node name="BottomEntry" type="Marker2D" parent="TileMap" unique_id=1127382023]
 position = Vector2(232, 128)
 script = ExtResource("5_k3n1d")
+direction = -1
 metadata/_custom_type_script = "uid://dtb63mo7rxraa"
 
 [node name="Player" parent="." unique_id=2138518394 instance=ExtResource("2_fj7yv")]

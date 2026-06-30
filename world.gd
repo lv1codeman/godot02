@@ -20,6 +20,7 @@ func _ready() -> void:
 	camera_2d.limit_left = used.position.x * tile_size.x
 	camera_2d.reset_smoothing()
 
-func update_player(pos: Vector2) -> void:
+func update_player(pos: Vector2, direction: Player.Direction) -> void:
 	player.global_position = pos
+	player.direction = direction
 	camera_2d.reset_smoothing()
