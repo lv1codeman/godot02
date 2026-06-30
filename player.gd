@@ -18,7 +18,7 @@ enum State{
 const GROUND_STATES := [
 	State.IDLE, State.RUNNING, State.LANDING, 
 	State.ATTACK_1, State.ATTACK_2
-	]
+]
 const RUN_SPEED := 160.0
 const FLOOR_ACCELERATION := RUN_SPEED / 0.2
 const AIR_ACCELERATION := RUN_SPEED / 0.1
@@ -27,11 +27,13 @@ const WALL_JUMP_VELOCITY := Vector2(300, -320)
 const KNOCKBACK_AMOUNT := 512.0
 
 @export var can_combo := false
+@export var max_jumps := 2  # 最大跳躍次數（2 代表可以二段跳）
 
 var default_gravity := ProjectSettings.get("physics/2d/default_gravity") as float
 var is_first_tick := false
 var is_combo_requested := false
 var pending_damage: Damage
+var jump_count := 0         # 目前已經跳了幾次
 
 @onready var graphics: Node2D = $Graphics
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
@@ -58,6 +60,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("attack") and can_combo:
 		is_combo_requested = true
 
+
 func tick_physics(state: State, delta: float) -> void:
 	if invincible_timer.time_left > 0:
 		# 無敵時間閃爍效果 Time.get_ticks_msec() / 40 分母越大閃越慢
@@ -79,7 +82,7 @@ func tick_physics(state: State, delta: float) -> void:
 		State.WALL_SLIDING:
 			move(default_gravity, delta)
 			graphics.scale.x = get_wall_normal().x
-			# 固定下滑速度
+			# 固定下滑速度最大值（防止撞擊天花板後速度失控暴增）
 			velocity.y = min(velocity.y, 120.0)
 		State.WALL_JUMP:
 			if state_machine.state_time < 0.1:
@@ -99,7 +102,6 @@ func tick_physics(state: State, delta: float) -> void:
 			
 func move(gravity: float, delta: float) -> void:
 	var direction := Input.get_axis("move_left","move_right")
-	var acceleration := FLOOR_ACCELERATION if is_on_floor() else AIR_ACCELERATION
 	#velocity.x = move_toward(velocity.x, direction * RUN_SPEED, acceleration * delta)
 	velocity.x = direction * RUN_SPEED
 	
@@ -110,6 +112,7 @@ func move(gravity: float, delta: float) -> void:
 		
 	move_and_slide()
 	
+
 func stand(gravity: float, delta: float) -> void:
 	var direction := Input.get_axis("move_left", "move_right")
 	var acceleration := FLOOR_ACCELERATION if is_on_floor() else AIR_ACCELERATION
@@ -120,31 +123,48 @@ func stand(gravity: float, delta: float) -> void:
 	velocity.y += gravity * delta
 	move_and_slide()
 	
+
 func die() -> void:
 	get_tree().reload_current_scene()
 	
+
 func can_wall_slide() -> bool:
 	return is_on_wall() and hand_checker.is_colliding() and foot_checker.is_colliding()
 	
+
+func is_wall_slide_related_state(state: State) -> bool:
+	return state == State.WALL_SLIDING or state == State.WALL_JUMP
+
+
 func get_next_state(state: State) -> int:
+	# 1. 死亡狀態
 	if stats.health == 0:
 		return StateMachine.KEEP_CURRENT if state == State.DYING else State.DYING
 		
+	# 2. 受傷狀態
 	if pending_damage:
 		return State.HURT
 		
+	# 3. 判斷一段跳（在地板或土狼時間內）
 	var can_jump := is_on_floor() or coyote_timer.time_left > 0
 	var should_jump := can_jump and jump_request_timer.time_left > 0
 	if should_jump:
 		return State.JUMP
 	
-	# 在任何情況下，state為GROUND_STATES但又不在地板上時，轉換到FALL狀態
-	if state in GROUND_STATES and not is_on_floor():
-		return State.FALL
+	# 4. 判斷二段跳（在空中且按下了跳躍鍵）
+	if (state == State.JUMP or state == State.FALL) and jump_request_timer.time_left > 0:
+		if jump_count < max_jumps:
+			return State.JUMP
+
+	# 5. 強制的 FALL / 空中判斷
+	if state in GROUND_STATES:
+		if not is_on_floor() and not is_wall_slide_related_state(state):
+			return State.FALL
 	
 	var direction := Input.get_axis("move_left","move_right")
 	var is_still := is_zero_approx(direction) and is_zero_approx(velocity.x)
 		
+	# 6. 詳細狀態機轉換
 	match state:
 		State.IDLE:
 			if Input.is_action_just_pressed("attack"):
@@ -187,22 +207,14 @@ func get_next_state(state: State) -> int:
 		State.ATTACK_2:
 			if not animation_player.is_playing():
 				return State.IDLE
-				
 		State.HURT:
 			if not animation_player.is_playing():
 				return State.IDLE
 				
-				
-				
 	return StateMachine.KEEP_CURRENT
 
+
 func transition_state(from: State, to: State) -> void:
-	#print("[%s] %s => %s" % [
-		#Engine.get_physics_frames(),
-		#State.keys()[from] if from != -1 else "<START>",
-		#State.keys()[to],
-	#])
-	
 	if from not in GROUND_STATES and to in GROUND_STATES:
 		coyote_timer.stop()
 	
@@ -210,22 +222,33 @@ func transition_state(from: State, to: State) -> void:
 	
 	match to:
 		State.IDLE:
-			animation_player.play("idle")
+			if animation_player.current_animation != "idle":
+				animation_player.play("idle")
 		State.RUNNING:
-			animation_player.play("running")
+			if animation_player.current_animation != "running":
+				animation_player.play("running")
 		State.JUMP:
 			animation_player.play("jump")
 			velocity.y = JUMP_VELOCITY
 			coyote_timer.stop()
 			jump_request_timer.stop()
+			# 每次成功進入跳躍狀態，跳躍計數 +1
+			jump_count += 1
 		State.FALL:
-			animation_player.play("fall")
+			if animation_player.current_animation != "fall":
+				animation_player.play("fall")
 			if from in GROUND_STATES:
 				coyote_timer.start()
+			# 如果是直接從平台邊緣走下去（而非跳躍後下落），強制把次數設為 1，確保空中只能再二段跳一次
+			if from != State.JUMP and jump_count == 0:
+				jump_count = 1
 		State.LANDING:
 			animation_player.play("landing")
 		State.WALL_SLIDING:
-			animation_player.play("wall_sliding")
+			if animation_player.current_animation != "wall_sliding":
+				animation_player.play("wall_sliding")
+			# 進入貼牆瞬間重置跳躍計數
+			jump_count = 0
 		State.WALL_JUMP:
 			animation_player.play("jump")
 			velocity = WALL_JUMP_VELOCITY
@@ -241,27 +264,26 @@ func transition_state(from: State, to: State) -> void:
 		State.HURT:
 			animation_player.play("hurt")
 			stats.health -= pending_damage.amount
-			print("Player health: %s" % stats.health) # 這裡順便把原本 log 寫錯的 Boar 改成 Player
+			print("Player health: %s" % stats.health)
 			
-			# 1. 計算原始方向
 			var dir := pending_damage.source.global_position.direction_to(global_position)
-			# 2. 強制將 Y 軸歸零，只保留左右方向
 			dir.y = 0
-			# 3. 重新歸一化（避免因為拿掉 Y 軸導致長度縮短），再乘以擊退力道
 			velocity = dir.normalized() * KNOCKBACK_AMOUNT
 			pending_damage = null
-			# 受傷時開始無敵時間計時
 			invincible_timer.start()
 		State.DYING:
 			animation_player.play("die")
 			animation_player.speed_scale = 0.5
 			invincible_timer.stop()
 			
+	# 當玩家重新進入任何地面狀態時，將跳躍計數安全重置
+	if to in GROUND_STATES:
+		jump_count = 0
+			
 	is_first_tick = true
 
 
 func _on_hurtbox_hurt(hitbox: Hitbox) -> void:
-	# 無敵時間
 	if invincible_timer.time_left > 0:
 		return
 	
@@ -270,25 +292,9 @@ func _on_hurtbox_hurt(hitbox: Hitbox) -> void:
 	pending_damage.source = hitbox.owner
 	
 
-func play_heal_effect(amount: int):
-	# 設定文字 (例如: "+3")
-	damage_number_label.text = "hp +" + str(amount)
-	
-	# 確保 Label 是可見的
-	damage_number_label.visible = true
-	
-	# 播放剛剛做好的動畫
-	# (AnimationPlayer 會在動畫結束時，根據我們設定的 Alpha 0，讓它看起來像消失)
-	effect_animation_player.play("heal_popup")
-
-	# (選做) 為了保險起見，可以在動畫結束後確保 Label 被隱藏
-	# effect_animation_player.animation_finished.connect(func(anim_name):
-	# 	if anim_name == "heal_popup":
-	# 		damage_number_label.visible = false
-	# , CONNECT_ONE_SHOT)
-	
-	
-	
-	
-	
-	
+# 處理吃藥水時顯示的補血特效
+func play_heal_effect(amount: int) -> void:
+	if damage_number_label and effect_animation_player:
+		damage_number_label.text = "hp +" + str(amount)
+		damage_number_label.visible = true
+		effect_animation_player.play("heal_popup")
