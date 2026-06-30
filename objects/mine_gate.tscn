@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dp0skb4j00lkc"]
+
+[ext_resource type="Script" uid="uid://cs2bqj3g7u1ya" path="res://classes/Teleporter.gd" id="1_wufsg"]
+[ext_resource type="Texture2D" uid="uid://2x2lthipmx1w" path="res://assets/Legacy-Fantasy - High Forest 2.3/Assets/Buildings.png" id="2_v5es6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_enc1a"]
+size = Vector2(42.5, 55)
+
+[node name="MineGate" type="Area2D" unique_id=1594083958]
+script = ExtResource("1_wufsg")
+metadata/_custom_type_script = "uid://cs2bqj3g7u1ya"
+
+[node name="Buildings" type="Sprite2D" parent="." unique_id=454602451]
+position = Vector2(-6, -61)
+texture = ExtResource("2_v5es6")
+region_enabled = true
+region_rect = Rect2(272, 208, 128, 160)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1117458187]
+position = Vector2(-4.75, -41.5)
+shape = SubResource("RectangleShape2D_enc1a")
